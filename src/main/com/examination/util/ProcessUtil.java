@@ -84,28 +84,12 @@ public class ProcessUtil {
         return indexs;
     }
 
-    /**
-     * 找到刚好比某特定字符大的另一字符位序
-     *
-     * @param index  索引值
-     * @param indexs 计算值
-     * @return 返回字符索引
-     */
-    public static int indexFind(int index, int[] indexs) {
-        int i;
-        for (i = 0; i < indexs.length; i++) {
-            if (indexs[i] > index) {
-                break;
-            }
-        }
-        return i;
-    }
 
     /**
      * 将指定数字字符串转为数字值
-     * @param formula
-     * @param fromIndex 开始索引值
-     * @param endIndex 结束索引值
+     * @param formula 带查找的式子
+     * @param fromIndex 操作数前的空格位序
+     * @param endIndex 操作数后的空格位序
      * @return
      */
     public static int changeNum(StringBuilder formula, int fromIndex, int endIndex) {
@@ -121,12 +105,12 @@ public class ProcessUtil {
     }
 
     /**
-     * 判断被减数、减数是否符合规范
-     * @param numerator1 分子1
-     * @param denominator1 分母1
-     * @param numerator2 分子1
-     * @param denominator2 分母2
-     * @return false:被减数<减数 || true:被减数>减数
+     * 判断被减数、减数是否符合规范(true:符合；false:不符合)
+     * @param numerator1 第一个操作数的分子
+     * @param denominator1  第一个操作数的分母
+     * @param numerator2 第二个操作数的分子
+     * @param denominator2 第二个操作数的分母
+     * @return
      */
     public static boolean judge(int numerator1, int denominator1, int numerator2, int denominator2) {
         int numerator = numerator1 * denominator2 - numerator2 * denominator1;
@@ -137,4 +121,29 @@ public class ProcessUtil {
     }
 
 
+
+    /**
+     * 通过字符串将操作数的分子分母转成数字
+     * @param extraCopy 进行操作的字符串
+     * @param beginIndex 操作数前的空格位序
+     * @return
+     */
+    public static int[] change(StringBuilder extraCopy, int beginIndex) {
+		int[] num = new int[3];
+		int[] blanks = charFind(" ", extraCopy);//存储空格的位序，方便找到完整的操作数
+		int indexBl = -1 ,indexBa ;
+		indexBa = extraCopy.indexOf("/", beginIndex);//反斜杠的位置
+		for(int i=0; i<blanks.length; i++) {
+			if(blanks[i]==beginIndex) {//找到传入空格位序在blanks中的位置
+				indexBl = i;
+				break;
+			}
+		}
+		num[0]=blanks[indexBl+1];//操作数后的空格位序
+		num[1]=changeNum(extraCopy,beginIndex,indexBa);//分子
+		num[2]=changeNum(extraCopy,indexBa,num[0]);//分母
+		return num;
+	}
 }
+
+

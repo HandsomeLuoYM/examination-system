@@ -1,7 +1,17 @@
 package main.com.examination.util;
 
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * @author Ming
+ * @date 2020/3/26 - 23:13
+ * @describe
+ */
 public class CalculateUtil {
 
+	private static final Logger logger = Logger.getLogger("CalculateUtil");
 
 	/**
 	 * 加法运算
@@ -78,7 +88,6 @@ public class CalculateUtil {
 			}
 			result.append(numerator+"/"+denominator);
 		}
-
 		return result;
 	}
 
@@ -105,54 +114,56 @@ public class CalculateUtil {
 		return result;
 	}
 
-	/*
+	/**
 	 * 对运算符号左右的两个数进行运算
-	 * */
+	 * @param index 运算符的位序
+	 * @param extraCopy 待计算的式子
+	 * @return
+	 */
 	public static StringBuilder calculate(int index,StringBuilder extraCopy) {
-		char sign = extraCopy.charAt(index);//保存符号
-		/**
-		 * 这里可以想办法封装一下（字符转成相应数字的分子分母）
-		 * 这里生成两个操作数的分子分母需要用到
-		 * 下面答案转化需要用到
-		 * 后面判断重复，需要判断数字是否相同，也同样要用到
-		 * */
-		int[] blanks = ProcessUtil.charFind(" ", extraCopy);//存储空格的位序，方便找到完整的操作数
-		int[] backslash = ProcessUtil.charFind("/", extraCopy);//存储反斜杠的位序，方便找到操作数的分子分母
-		int idBlank = ProcessUtil.indexFind(index, blanks);//第二个操作数的开头空格位序
-		int idBack = ProcessUtil.indexFind(blanks[idBlank], backslash);//第二个操作数的反斜杠位序
-		/*
-		 * 分别存储两个操作数的分子分母
-		 * 通过changeNum将数字字符转为数字
-		 * */
-		int numerator1 = ProcessUtil.changeNum(extraCopy, blanks[idBlank-2], backslash[idBack-1]);
-		int denominator1 = ProcessUtil.changeNum(extraCopy, backslash[idBack-1], blanks[idBlank-1]);
-		int numerator2 = ProcessUtil.changeNum(extraCopy, blanks[idBlank], backslash[idBack]);
-		int denominator2 = ProcessUtil.changeNum(extraCopy, backslash[idBack], blanks[idBlank+1]);
-		extraCopy.delete(blanks[idBlank-2]+1,blanks[idBlank+1]);//删除数字部分
+		char sign = extraCopy.charAt(index);
+		int beginIndex = 0, endIndex = -1;
+		int[] datas = new int[3];
+		for(int index1=0; ; beginIndex=index1) {//找到第一个操作数的开头空格
+			index1 = extraCopy.indexOf(" ", index1+1);
+			if(index1==(index-1)) {
+				break;
+			}
+		}
+		datas = ProcessUtil.change(extraCopy, beginIndex);
+		int numerator1 = datas[1];
+		int denominator1 = datas[2];
+		datas = new int[3];
+		datas = ProcessUtil.change(extraCopy, index+1);
+		int numerator2 = datas[1];
+		int denominator2 = datas[2];
+		endIndex = datas[0];
+		extraCopy.delete(beginIndex+1,endIndex);//删除数字部分
 		//根据符号进行相应的运算
 		switch(sign){
 			case '+':
-				extraCopy.insert(blanks[idBlank-2]+1, add(numerator1,denominator1,numerator2,denominator2));
+				extraCopy.insert(beginIndex+1, add(numerator1,denominator1,numerator2,denominator2));
 				break;
 			case '-':
 				if(!ProcessUtil.judge(numerator1, denominator1, numerator2, denominator2)) {
-					extraCopy.insert(0, "@ ");//识别答案是否为负数，是的话在开头插入@作为识别
+					extraCopy.insert(0, "@ ");//识别答案是否为负数
 					break;
 				}
 				else{
-					extraCopy.insert(blanks[idBlank-2]+1, minus(numerator1,denominator1,numerator2,denominator2));
+					extraCopy.insert(beginIndex+1, minus(numerator1,denominator1,numerator2,denominator2));
 					break;
 				}
 			case '*':
-				extraCopy.insert(blanks[idBlank-2]+1, multiply(numerator1,denominator1,numerator2,denominator2));
+				extraCopy.insert(beginIndex+1, multiply(numerator1,denominator1,numerator2,denominator2));
 				break;
 			case '÷':
 				if(numerator2 == 0) {
 					extraCopy.insert(0, "@ ");//识别答案是否为负数，是的话在开头插入@作为识别
+					System.out.println(extraCopy);
 					break;
 				}
 				else{
-					extraCopy.insert(blanks[idBlank-2]+1, divide(numerator1,denominator1,numerator2,denominator2));
+					extraCopy.insert(beginIndex+1, divide(numerator1,denominator1,numerator2,denominator2));
 					break;
 				}
 			default: break;
@@ -166,39 +177,37 @@ public class CalculateUtil {
 	 * @return 返回
 	 */
 	public static StringBuilder calculateFormula(StringBuilder extraCopy) {
-		System.out.println(extraCopy);
+		logger.info(extraCopy.toString());
 		//记录符号的位序
 		int index = -1;
 		//计算式子
-		while((extraCopy.indexOf("*")>=0)||(extraCopy.indexOf("÷")>=0)||(extraCopy.indexOf("+")>=0)||(extraCopy.indexOf("-")>=0)) {
-			if((index = extraCopy.indexOf("*"))>=0) {
-				CalculateUtil.calculate(index, extraCopy);
-			}
-			if((index = extraCopy.indexOf("÷"))>=0) {
-				CalculateUtil.calculate(index, extraCopy);
+		Pattern pattern1 = Pattern.compile("[*]|[÷]");
+		Matcher m1;
+		while((m1 = pattern1.matcher(extraCopy)).find()) {
+			index = m1.start();
+			calculate(index, extraCopy);
+			if(extraCopy.charAt(0)=='@') {
+				break;
+			}	
+		}
+		//如果式子正确，在进行加运算（从左到右）
+		if(extraCopy.charAt(0)!='@') {
+			Pattern pattern2 = Pattern.compile("[-]|[+]");
+			Matcher m2;
+			while((m2 = pattern2.matcher(extraCopy)).find()) {
+				index = m2.start();
+				calculate(index, extraCopy);
 				if(extraCopy.charAt(0)=='@') {
 					break;
-				}
-			}
-			if((index = extraCopy.indexOf("+"))>=0) {
-				CalculateUtil.calculate(index, extraCopy);
-			}
-			if((index = extraCopy.indexOf("-"))>=0) {
-				CalculateUtil.calculate(index, extraCopy);
-				if(extraCopy.charAt(0)=='@') {
-					break;
-				}
+				}	
 			}
 		}
-		/**
-		 * 生成分子分母可以的话封装一下
-		 * */
 		//如果运算结束后（式子正确），调整答案格式
 		if(extraCopy.charAt(0)!='@') {
-			int[] blanks01 = ProcessUtil.charFind(" ", extraCopy);//存储空格的位序
-			int[] backslash01 = ProcessUtil.charFind("/", extraCopy);//存储反斜杠的位序
-			int numerator = ProcessUtil.changeNum(extraCopy, blanks01[0], backslash01[0]);
-			int denominator = ProcessUtil.changeNum(extraCopy, backslash01[0], blanks01[1]);
+			int datas[] = new int[3];
+			datas = ProcessUtil.change(extraCopy, 0);
+			int numerator = datas[1];
+			int denominator = datas[2];
 			extraCopy.setLength(0);//将原存储内容清空
 			extraCopy.append(ProcessUtil.creatNum(numerator, denominator));//将答案换成标准格式
 		}

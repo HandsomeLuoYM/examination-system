@@ -17,7 +17,7 @@ import java.io.PrintWriter;
  */
 
 
-public class MyExGUI {
+public class ExGui {
 
     private JFrame mainWindow = new JFrame("四则运算练习软件");
 
@@ -36,7 +36,7 @@ public class MyExGUI {
     private JLabel JLBRemainTip = new JLabel("余数");
 
     private JTextField JTFUserName = new JTextField(8);//10的单位不是px 而是指定列数
-    private String[] operationType = {"+","-","*","/","混合"};
+    private String[] operationType = {"混合"};
     private String[] numberOfDigitType = {"1","2","3","4"};
     private JComboBox<String> JCBOperationSelect = new JComboBox<String>(operationType);//JComboBox 泛型 需要加上<E>
     private JComboBox<String> JCBNumberOfDigit = new JComboBox<String>(numberOfDigitType);
@@ -58,7 +58,7 @@ public class MyExGUI {
     private Font JLBAnsFont = new Font("微软雅黑",Font.PLAIN,16);
 
     //类型为Operation的questions数组，只有这个才和Operation类等等那些类关联起来
-    private Operation[] questions = new Operation[10];
+//    private Operation[] questions = new Operation[10];
     //用户答案数组
     private int[] userAnswer = new int[10];
     //用户余数数组
@@ -112,7 +112,7 @@ public class MyExGUI {
         }
     }
 
-    public MyExGUI(){
+    public ExGui(){
 
         //布局用户名&选择面板
         selectPanel.setPreferredSize(new Dimension(700,50));
@@ -477,7 +477,7 @@ public class MyExGUI {
 
 
             //questions的类型是operation，用答案和余数这两个数组给questions这个数组赋值
-            questions[i].setUsersAnswer(userAnswer[i],remainder[i]);
+//            questions[i].setUsersAnswer(userAnswer[i],remainder[i]);
 
             //以下这种分开是否有余数的做法是错误的，因为在运算为混合时chara的值是看第十题的（第十题的chara会覆盖掉前面的）。 万一除法没有余数就会报错
             /*if(chara.equals("/"))
@@ -492,10 +492,10 @@ public class MyExGUI {
             }*/
 
             //使正确答案显示在面板上
-            JLBAnswers[i].setText(questions[i].ptintQA());
+//            JLBAnswers[i].setText(questions[i].ptintQA());
 
             //在面板上显示答案是否正确
-            JLBIsTrue[i].setText(questions[i].isCorrect());
+//            JLBIsTrue[i].setText(questions[i].isCorrect());
 
             //如果错误则将答案和是否正确两个标签的字体颜色设置为红色
             if(JLBIsTrue[i].getText().equals("回答错误"))
@@ -532,7 +532,7 @@ public class MyExGUI {
         //将每道题的正确答案和用户答案写入文件
         for(int i = 0;i < 10;i++)
         {
-            questions[i].writeToFile(aUserRec);
+//            questions[i].writeToFile(aUserRec);
         }
 
         //将得分和用时写入文件
