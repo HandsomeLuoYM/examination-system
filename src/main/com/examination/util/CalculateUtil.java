@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  * @date 2020/3/26 - 23:13
  * @describe
  */
+@SuppressWarnings("all")
 public class CalculateUtil {
 
 	private static final Logger logger = Logger.getLogger("CalculateUtil");
@@ -210,6 +211,7 @@ public class CalculateUtil {
 			int denominator = datas[2];
 			extraCopy.setLength(0);//将原存储内容清空
 			extraCopy.append(ProcessUtil.creatNum(numerator, denominator));//将答案换成标准格式
+			extraCopy.deleteCharAt(extraCopy.length()-1);
 		}
 		return extraCopy;
 	}
