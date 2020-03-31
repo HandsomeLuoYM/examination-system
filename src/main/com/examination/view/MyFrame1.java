@@ -3,6 +3,7 @@ package main.com.examination.view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
@@ -140,7 +141,11 @@ public class MyFrame1{
 					}
 					else {
 						frame.dispose();
-						MyFrame2 f = new MyFrame2(formulaNum, maxNum);
+						try {
+							MyFrame2 f = new MyFrame2(formulaNum, maxNum);
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
 					}
 				}
 				else {

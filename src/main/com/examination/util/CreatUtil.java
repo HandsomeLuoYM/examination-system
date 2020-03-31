@@ -1,7 +1,9 @@
 package main.com.examination.util;
 
 import main.com.examination.commons.Operator;
+import main.com.examination.dao.FileDao;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -117,7 +119,7 @@ public class CreatUtil {
      * @param num 生成的式子数目
      * @param maxNum 最大值
      */
-    public void formulaNum(int num, int maxNum) {
+    public void formulaNum(int num, int maxNum) throws IOException {
         //存放拆分完的式子
         List<List<String>> formulaLists = new ArrayList<List<String>>(num);
         formula = new ArrayList<StringBuilder>();
@@ -135,6 +137,8 @@ public class CreatUtil {
             answer.add(extraCopy);
         }
         int i=0;
+        FileDao.storageFile(formula,"Exercises.txt");
+        FileDao.storageFile(answer,"Answers.txt");
         for(StringBuilder temp:formula) {
             System.out.println((i+1)+"、"+temp+answer.get(i));
             i++;
