@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  * @date 2020/3/26 - 23:13
  * @describe
  */
-@SuppressWarnings("all")
+@SuppressWarnings("unused")
 public class CalculateUtil {
 
 	private static final Logger logger = Logger.getLogger("CalculateUtil");
@@ -125,7 +125,8 @@ public class CalculateUtil {
 		char sign = extraCopy.charAt(index);
 		int beginIndex = 0, endIndex = -1;
 		int[] datas = new int[3];
-		for(int index1=0; ; beginIndex=index1) {//找到第一个操作数的开头空格
+		for(int index1=0; ; beginIndex=index1) {
+			//找到第一个操作数的开头空格
 			index1 = extraCopy.indexOf(" ", index1+1);
 			if(index1==(index-1)) {
 				break;
@@ -139,7 +140,8 @@ public class CalculateUtil {
 		int numerator2 = datas[1];
 		int denominator2 = datas[2];
 		endIndex = datas[0];
-		extraCopy.delete(beginIndex+1,endIndex);//删除数字部分
+		//删除数字部分
+		extraCopy.delete(beginIndex+1,endIndex);
 		//根据符号进行相应的运算
 		switch(sign){
 			case '+':
@@ -147,7 +149,8 @@ public class CalculateUtil {
 				break;
 			case '-':
 				if(!ProcessUtil.judge(numerator1, denominator1, numerator2, denominator2)) {
-					extraCopy.insert(0, "@ ");//识别答案是否为负数
+					//识别答案是否为负数
+					extraCopy.insert(0, "@ ");
 					break;
 				}
 				else{
@@ -159,8 +162,8 @@ public class CalculateUtil {
 				break;
 			case '÷':
 				if(numerator2 == 0) {
-					extraCopy.insert(0, "@ ");//识别答案是否为负数，是的话在开头插入@作为识别
-					System.out.println(extraCopy);
+					//识别答案是否为负数，是的话在开头插入@作为标识
+					extraCopy.insert(0, "@ ");
 					break;
 				}
 				else{
@@ -178,7 +181,7 @@ public class CalculateUtil {
 	 * @return 返回
 	 */
 	public static StringBuilder calculateFormula(StringBuilder extraCopy) {
-		logger.info(extraCopy.toString());
+//		logger.info(extraCopy.toString());
 		//记录符号的位序
 		int index = -1;
 		//计算式子
@@ -209,8 +212,10 @@ public class CalculateUtil {
 			datas = ProcessUtil.change(extraCopy, 0);
 			int numerator = datas[1];
 			int denominator = datas[2];
-			extraCopy.setLength(0);//将原存储内容清空
-			extraCopy.append(ProcessUtil.creatNum(numerator, denominator));//将答案换成标准格式
+			//将原存储内容清空
+			extraCopy.setLength(0);
+			//将答案换成标准格式
+			extraCopy.append(ProcessUtil.creatNum(numerator, denominator));
 			extraCopy.deleteCharAt(extraCopy.length()-1);
 		}
 		return extraCopy;

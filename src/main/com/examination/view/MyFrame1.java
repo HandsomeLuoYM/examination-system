@@ -3,12 +3,14 @@ package main.com.examination.view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import main.com.examination.view.MyFrame2;
+
 
 @SuppressWarnings("all")
 public class MyFrame1{
@@ -54,19 +56,21 @@ public class MyFrame1{
 
 	private JDialog creatExpression() {
 		JDialog expression = new JDialog(frame,"说明",true);
-		expression.setSize(300, 200);
+		expression.setSize(300, 250);
 		expression.setResizable(false);//设置对话框大小不能改变
 		expression.setLocationRelativeTo(null);//居中
-		expression.setLayout(new GridLayout(4,1));
+		expression.setLayout(new GridLayout(6,1));
 		Container c = expression.getContentPane();
 		JLabel label1 = new JLabel("1、本系统只支持10以内的四则运算");
 		JLabel label2 = new JLabel("2、答案必须是化简后的结果");
 		JLabel label3 = new JLabel("3、答案不可出现假分数");
 		JLabel label4 = new JLabel("4、本系统支持统计错题");
+		JLabel label5 = new JLabel("5、本系统仅支持英文输入法");
 		c.add(label1);
 		c.add(label2);
 		c.add(label3);
 		c.add(label4);
+		c.add(label5);
 		return expression;
 	}
 
@@ -140,12 +144,7 @@ public class MyFrame1{
 						warning.setVisible(true);
 					}
 					else {
-						frame.dispose();
-						try {
-							MyFrame2 f = new MyFrame2(formulaNum, maxNum);
-						} catch (IOException ex) {
-							ex.printStackTrace();
-						}
+						creatTips(frame, formulaNum, maxNum);
 					}
 				}
 				else {
@@ -175,5 +174,44 @@ public class MyFrame1{
 			}
 		});
 	}
-
+	private JDialog creatTips(JFrame frame, int formulaNum, int maxNum) {
+		JDialog tips = new JDialog(frame, "提示", true);
+		tips.setSize(220,120);
+		tips.setLocationRelativeTo(null);
+		tips.setResizable(false);
+		tips.setLayout(new GridLayout(2,1));
+		Container c = tips.getContentPane();
+		JLabel label = new JLabel("是否导入题目？",JLabel.CENTER);
+		
+		c.add(label);
+		JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT,32,0));
+		c.add(panel);
+		JButton button1 = new JButton("确认");
+		button1.setSize(60, 25);
+		panel.add(button1);
+		JButton button2 = new JButton("取消");
+		button2.setSize(60, 25);
+		panel.add(button2);
+		button1.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.dispose();
+				try {
+					MyFrame2 f = new MyFrame2(formulaNum, maxNum);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		button2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tips.dispose();
+			}
+		});
+		tips.setVisible(true);
+		return tips;
+	}
 }

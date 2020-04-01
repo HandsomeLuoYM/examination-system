@@ -61,8 +61,8 @@ public class ProcessUtil {
     /**
      * 将式子中指定字符的所有位序存储起来
      * @param str 字符串
-     * @param formula
-     * @return
+     * @param formula 式子
+     * @return 返回位序
      */
     public static int[] charFind(String str, StringBuilder formula) {
         int[] indexs = new int[20];
@@ -90,7 +90,7 @@ public class ProcessUtil {
      * @param formula 带查找的式子
      * @param fromIndex 操作数前的空格位序
      * @param endIndex 操作数后的空格位序
-     * @return
+     * @return 返回数字
      */
     public static int changeNum(StringBuilder formula, int fromIndex, int endIndex) {
         int num = -1;
@@ -110,7 +110,7 @@ public class ProcessUtil {
      * @param denominator1  第一个操作数的分母
      * @param numerator2 第二个操作数的分子
      * @param denominator2 第二个操作数的分母
-     * @return
+     * @return 返回是否正确
      */
     public static boolean judge(int numerator1, int denominator1, int numerator2, int denominator2) {
         int numerator = numerator1 * denominator2 - numerator2 * denominator1;
@@ -126,7 +126,7 @@ public class ProcessUtil {
      * 通过字符串将操作数的分子分母转成数字
      * @param extraCopy 进行操作的字符串
      * @param beginIndex 操作数前的空格位序
-     * @return
+     * @return 返回数字集
      */
     public static int[] change(StringBuilder extraCopy, int beginIndex) {
 		int[] num = new int[3];

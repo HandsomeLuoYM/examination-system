@@ -5,11 +5,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.File;
 import java.io.IOException;
 
 import javax.swing.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import main.com.examination.util.CreatUtil;
+import main.com.examination.dao.*;
 
 public class MyFrame2 {
 	private int formulaNum;
@@ -22,12 +27,21 @@ public class MyFrame2 {
 	boolean flag;//标志该题是否做过
 
 	CreatUtil creatFor = new CreatUtil();
+	
+	List<StringBuilder> formulas ;
+	List<StringBuilder> answers ;
 
 	public MyFrame2(int formula, int max) throws IOException {
 		formulaNum = formula;
 		maxNum = max;
 		creatFor.formulaNum(formulaNum, maxNum);
 		errorTitle = new int[formulaNum];
+		File file = new File("Exercises.txt");
+		formulas = FileDao.readFile(new File("D:\\idea_maven\\Exercises.txt"));
+		answers = FileDao.readFile(new File("D:\\idea_maven\\Answers.txt"));
+//		for(StringBuilder temp:answers) {
+//			System.out.println(temp);
+//		}
 		creatFrame(1);
 	}
 
@@ -81,7 +95,7 @@ public class MyFrame2 {
 							}
 						}
 						if(k>=titleNum) {//全部填写完成
-							System.out.println(errorNum);
+//							System.out.println(errorNum);
 							int temp = page+1;//页面加一
 							frame.dispose();//当前页面销毁
 							creatFrame(temp);//生成新页面
@@ -120,7 +134,7 @@ public class MyFrame2 {
 				c.add(panel);
 				titleNum = 10*(page-1)+i;
 				//生成题目
-				JLabel label = new JLabel(String.valueOf(titleNum)+"、"+creatFor.getFormula().get(titleNum-1).toString());
+				JLabel label = new JLabel(String.valueOf(titleNum)+"、"+formulas.get(titleNum-1).toString());
 				label.setFont(new Font("宋体",Font.BOLD,18));
 				panel.add(label);
 				JTextField text = new JTextField(8);
@@ -130,25 +144,20 @@ public class MyFrame2 {
 					@Override
 					public void focusLost(FocusEvent e) {//失去焦点
 						String str = text.getText();
-						if(str.equals(creatFor.getAnswer().get(title-1).toString())) {//答案正确
+						if(str.equals(answers.get(title-1).toString())) {//答案正确
 							if(errorTitle[title-1]==1) {//题目曾被记为错题
-								System.out.println("错改对");
 								errorNum--;
 							}
-							System.out.println("对");
 							errorTitle[title-1] = 2;
 						}
 						else {//答案错误
 							if(str.equals("")) {
-								System.out.println("空");
 								errorTitle[title-1] = 0;//该文本为空，则说明没有填写
 							}
 							else {
 								if(errorTitle[title-1]==0||errorTitle[title-1]==2) {//如果题号-1的位置上标识为0或为2，说明未被存储过
-									System.out.println("空改错或对改错");
 									errorNum++;
 								}
-								System.out.println("错");
 								errorTitle[title-1] = 1;//将该位置元素置为1，说明该题错误
 							}
 						}
@@ -191,13 +200,7 @@ public class MyFrame2 {
 				button1.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						errorNum = 0;
-						errorTitle = new int[formulaNum];
-						try {
-							new MyFrame2(formulaNum, maxNum);
-						} catch (IOException ex) {
-							ex.printStackTrace();
-						}
+						creatTips(frame);
 					}
 				});
 				button2.addActionListener(new ActionListener() {
@@ -211,8 +214,11 @@ public class MyFrame2 {
 								break;
 							}
 						}
-						JDialog count = creatCount(frame);
-						count.setVisible(true);
+						if(k>=titleNum) {
+							creatCountFile();
+							JDialog count = creatCount(frame);
+							count.setVisible(true);
+						}
 					}
 				});
 				button3.addActionListener(new ActionListener() {
@@ -231,6 +237,7 @@ public class MyFrame2 {
 							String str = text1.getText();
 							int temp = Integer.parseInt(str);//获取要跳转的页面数
 							if(temp<=(formulaNum+9)/10) {
+								titleNum = 0;
 								frame.dispose();
 								creatFrame(temp);
 							}
@@ -253,6 +260,49 @@ public class MyFrame2 {
 		return frame;
 	}
 
+	private JDialog creatTips(JFrame frame) {
+		JDialog tips = new JDialog(frame, "提示", true);
+		tips.setSize(220,120);
+		tips.setLocationRelativeTo(null);
+		tips.setResizable(false);
+		tips.setLayout(new GridLayout(2,1));
+		Container c = tips.getContentPane();
+		JLabel label = new JLabel("是否导入题目？",JLabel.CENTER);
+		
+		c.add(label);
+		JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEFT,32,0));
+		c.add(panel);
+		JButton button1 = new JButton("确认");
+		button1.setSize(60, 25);
+		panel.add(button1);
+		JButton button2 = new JButton("取消");
+		button2.setSize(60, 25);
+		panel.add(button2);
+		button1.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				errorNum = 0;
+				errorTitle = new int[formulaNum];
+				frame.dispose();
+				try {
+					new MyFrame2(formulaNum, maxNum);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		button2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tips.dispose();
+			}
+		});
+		tips.setVisible(true);
+		return tips;
+	}
+	
 	private JDialog creatCount(JFrame frame) {
 		JDialog count = new JDialog(frame,"错误统计",true);
 		count.setSize(100, 100);
@@ -292,5 +342,26 @@ public class MyFrame2 {
 			}
 		});
 		return warning;
+	}
+	
+	private void creatCountFile() {
+		List<StringBuilder> result = new ArrayList<StringBuilder>();
+		StringBuilder correct = new StringBuilder();
+		StringBuilder error = new StringBuilder();
+		correct.append("correct："+(formulaNum-errorNum)+"(");
+		error.append("error："+(errorNum)+"(");
+		for(int i=0; i<errorTitle.length; i++) {
+			if(errorTitle[i]==2) {
+				correct.append((i+1)+"、");
+			}
+			else {
+				error.append((i+1)+"、");
+			}
+		}
+		correct.setCharAt(correct.length()-1, '）');
+		error.setCharAt(error.length()-1, '）');
+		result.add(correct);
+		result.add(error);
+		FileDao.storageFile1(result, "Count.txt");
 	}
 }

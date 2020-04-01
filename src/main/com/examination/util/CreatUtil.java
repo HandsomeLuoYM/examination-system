@@ -5,6 +5,7 @@ import main.com.examination.dao.FileDao;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -14,7 +15,6 @@ import java.util.logging.Logger;
  * @date 2020/3/26 - 23:13
  * @describe
  */
-@SuppressWarnings("all")
 public class CreatUtil {
 
     //日志输出
@@ -62,19 +62,24 @@ public class CreatUtil {
     public StringBuilder creatNum(StringBuilder formula,int maxNum) {
     	int numerator,denominator,type;
 		type = (int)(Math.random()*2);
-		if(type==0) {//生成整数
+        //生成整数
+		if(type==0) {
 			do {
 				numerator =(int)(Math.random()*10);
 			}while(numerator > maxNum);
-			extraCopy.append(numerator+"/"+1+" ");//备份分子/分母
+            //备份分子/分母
+			extraCopy.append(numerator+"/"+1+" ");
 			formula.append(numerator+" ");
 		}
 		else {
 			do {
-				numerator = (int)(Math.random()*10);//随机生成分子
-				while((denominator=(int)(Math.random()*10))==0){;}//保证分母不等于0
+                //随机生成分子
+				numerator = (int)(Math.random()*10);
+                //保证分母不等于0
+				while((denominator=(int)(Math.random()*10))==0);
 			}while(!numRange(numerator, denominator,maxNum));
-			extraCopy.append(numerator+"/"+denominator+" ");//备份分子/分母
+            //备份分子/分母
+			extraCopy.append(numerator+"/"+denominator+" ");
 			formula.append(ProcessUtil.creatNum(numerator, denominator));
 		}
 		return formula;
@@ -120,6 +125,7 @@ public class CreatUtil {
      * @param maxNum 最大值
      */
     public void formulaNum(int num, int maxNum) throws IOException {
+        Long beginTime = System.currentTimeMillis();
         //存放拆分完的式子
         List<List<String>> formulaLists = new ArrayList<List<String>>(num);
         formula = new ArrayList<StringBuilder>();
@@ -140,9 +146,10 @@ public class CreatUtil {
         FileDao.storageFile(formula,"Exercises.txt");
         FileDao.storageFile(answer,"Answers.txt");
         for(StringBuilder temp:formula) {
-            System.out.println((i+1)+"、"+temp+answer.get(i));
+//            System.out.println((i+1)+"、"+temp+answer.get(i));
             i++;
         }
+        System.out.println("生成时间: " + (System.currentTimeMillis()-beginTime));
     }
 
     /**
