@@ -3,17 +3,26 @@ package main.com.examination.view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import main.com.examination.view.MyFrame2;
+
+import java.util.List;
+
+import main.com.examination.dao.FileDao;
+import main.com.examination.util.CreatUtil;
+import main.com.examination.view.UserUI;
 
 
 @SuppressWarnings("all")
-public class MyFrame1{
+public class MainUI {
+	private String pathFormula;//式子文件路径
+	private String pathAnswer;//答案文件路径
 
 	JFrame frame = new JFrame();
 
@@ -21,6 +30,8 @@ public class MyFrame1{
 	JPanel panel2 = new JPanel();
 	JPanel panel3 = new JPanel();
 	Container c;
+
+	CreatUtil creatFor = new CreatUtil();
 
 	private JLabel label1 = new JLabel("欢迎来到四则运算的世界");
 	private JLabel label2 = new JLabel("请输入生成式子的数目：");
@@ -74,7 +85,7 @@ public class MyFrame1{
 		return expression;
 	}
 
-	public MyFrame1() {
+	public MainUI() {
 		frame.setTitle("四则运算软件");
 		frame.setSize(500, 300);
 		frame.setLocationRelativeTo(null);//居中
@@ -144,6 +155,12 @@ public class MyFrame1{
 						warning.setVisible(true);
 					}
 					else {
+						try {
+							creatFor.formulaNum(formulaNum, maxNum);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						creatTips(frame, formulaNum, maxNum);
 					}
 				}
@@ -174,6 +191,81 @@ public class MyFrame1{
 			}
 		});
 	}
+
+	private JDialog creatDao(JFrame frame) {
+		JDialog dao = new JDialog(frame, "提示", true) ;
+		dao.setSize(300,200);
+		dao.setLocationRelativeTo(null);
+		dao.setResizable(false);
+		dao.setLayout(null);
+		Container c = dao.getContentPane();
+		JLabel label1 = new JLabel("请输入存放式子文件的绝对路径:",JLabel.LEFT);
+		label1.setBounds(5, 5, 200, 25);
+		c.add(label1);
+		JTextField text1 = new JTextField(250);
+		text1.setBounds(5, 35, 280, 25);
+		c.add(text1);
+		JLabel label2 = new JLabel("请输入存放答案文件的绝对路径:",JLabel.LEFT);
+		label2.setBounds(5, 65, 200, 25);
+		c.add(label2);
+		JTextField text2 = new JTextField(250);
+		text2.setBounds(5, 95, 280, 25);
+		c.add(text2);
+		JButton button = new JButton("确认");
+		button.setBounds(210,135,60,25);
+		c.add(button);
+		text1.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {//失去焦点
+				pathFormula = text1.getText();
+			}
+			@Override
+			public void focusGained(FocusEvent e) {//获取焦点
+
+			}
+		});
+		text2.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent e) {//失去焦点
+				pathAnswer = text2.getText();
+			}
+			@Override
+			public void focusGained(FocusEvent e) {//获取焦点
+
+			}
+		});
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				File file1 = new File(pathFormula);
+				List<StringBuilder> formulas = FileDao.readFile(file1);
+				if(formulas==null) {
+					text1.setBorder(BorderFactory.createLineBorder(Color.red));
+				}
+				else {
+					FileDao.storageFile(formulas, "Exercises.txt");
+				}
+				File file2 = new File(pathAnswer);
+				List<StringBuilder> answers = FileDao.readFile(file2);
+				if(formulas==null) {
+					text1.setBorder(BorderFactory.createLineBorder(Color.red));
+				}
+				else {
+					FileDao.storageFile(answers, "Answers.txt");
+					frame.dispose();
+					try {
+						UserUI f = new UserUI(answers.size(),10);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		dao.setVisible(true);
+		return dao;
+	}
+
 	private JDialog creatTips(JFrame frame, int formulaNum, int maxNum) {
 		JDialog tips = new JDialog(frame, "提示", true);
 		tips.setSize(220,120);
@@ -182,7 +274,6 @@ public class MyFrame1{
 		tips.setLayout(new GridLayout(2,1));
 		Container c = tips.getContentPane();
 		JLabel label = new JLabel("是否导入题目？",JLabel.CENTER);
-		
 		c.add(label);
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEFT,32,0));
@@ -196,19 +287,21 @@ public class MyFrame1{
 		button1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				frame.dispose();
-				try {
-					MyFrame2 f = new MyFrame2(formulaNum, maxNum);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				tips.dispose();
+				creatDao(frame);
+
 			}
 		});
 		button2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tips.dispose();
+				frame.dispose();
+				try {
+					UserUI f = new UserUI(formulaNum, maxNum);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		tips.setVisible(true);

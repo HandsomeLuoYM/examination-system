@@ -43,7 +43,7 @@ public class CheckUtil {
     }
 
     /**
-     * 判断内容是否有重复（答案为判断）
+     * 判断内容是否有重复
      * @param formula 判断的式子
      * @param lists 排序完的全部 list
      * @param answer 答案

@@ -216,7 +216,6 @@ public class CalculateUtil {
 			extraCopy.setLength(0);
 			//将答案换成标准格式
 			extraCopy.append(ProcessUtil.creatNum(numerator, denominator));
-			extraCopy.deleteCharAt(extraCopy.length()-1);
 		}
 		return extraCopy;
 	}

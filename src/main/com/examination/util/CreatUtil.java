@@ -145,10 +145,6 @@ public class CreatUtil {
         int i=0;
         FileDao.storageFile(formula,"Exercises.txt");
         FileDao.storageFile(answer,"Answers.txt");
-        for(StringBuilder temp:formula) {
-//            System.out.println((i+1)+"、"+temp+answer.get(i));
-            i++;
-        }
         System.out.println("生成时间: " + (System.currentTimeMillis()-beginTime));
     }
 
@@ -169,6 +165,5 @@ public class CreatUtil {
         }
         return false;
     }
-    
-    
+
 }

@@ -11,7 +11,7 @@ public class ProcessUtil {
      * 将答案按规范生成出来
      * @param numerator 分子
      * @param denominator 分母
-     * @return
+     * @return 式子
      */
     public static StringBuilder creatNum(int numerator, int denominator) {
         StringBuilder num = new StringBuilder();

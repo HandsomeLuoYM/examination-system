@@ -13,7 +13,13 @@ public class FileDao {
 
     private static final String PATH = System.getProperty("user.dir");
 
-    public static boolean storageFile1(List<StringBuilder> list, String fileName)  {
+    /**
+     * 将结果存储到文件中
+     * @param list 存储集
+     * @param fileName 文件名
+     * @return 返回是否成功
+     */
+    public static boolean storageResult(List<StringBuilder> list, String fileName)  {
         File file = new File(PATH + "\\" +fileName);
         FileOutputStream fileOutputStream = null;
         try {
@@ -25,6 +31,7 @@ public class FileDao {
             fileOutputStream.write(content.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }finally {
             try {
                 fileOutputStream.close();

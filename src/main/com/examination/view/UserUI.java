@@ -16,7 +16,7 @@ import java.util.List;
 import main.com.examination.util.CreatUtil;
 import main.com.examination.dao.*;
 
-public class MyFrame2 {
+public class UserUI {
 	private int formulaNum;
 	private int maxNum;
 
@@ -27,21 +27,16 @@ public class MyFrame2 {
 	boolean flag;//标志该题是否做过
 
 	CreatUtil creatFor = new CreatUtil();
-	
+
 	List<StringBuilder> formulas ;
 	List<StringBuilder> answers ;
 
-	public MyFrame2(int formula, int max) throws IOException {
+	public UserUI(int formula, int max) throws IOException {
 		formulaNum = formula;
 		maxNum = max;
-		creatFor.formulaNum(formulaNum, maxNum);
 		errorTitle = new int[formulaNum];
-		File file = new File("Exercises.txt");
-		formulas = FileDao.readFile(new File("D:\\idea_maven\\Exercises.txt"));
-		answers = FileDao.readFile(new File("D:\\idea_maven\\Answers.txt"));
-//		for(StringBuilder temp:answers) {
-//			System.out.println(temp);
-//		}
+		formulas = FileDao.readFile(new File("Exercises.txt"));
+		answers = FileDao.readFile(new File("Answers.txt"));
 		creatFrame(1);
 	}
 
@@ -95,7 +90,6 @@ public class MyFrame2 {
 							}
 						}
 						if(k>=titleNum) {//全部填写完成
-//							System.out.println(errorNum);
 							int temp = page+1;//页面加一
 							frame.dispose();//当前页面销毁
 							creatFrame(temp);//生成新页面
@@ -197,10 +191,16 @@ public class MyFrame2 {
 				panel1.add(label3);
 				JButton button3 = new JButton("跳转");
 				endPanel.add(button3);
-				button1.addActionListener(new ActionListener() {
+				button1.addActionListener(new ActionListener() {//生成新式子
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						creatTips(frame);
+						try {
+							creatFor.formulaNum(formulaNum, maxNum);
+							UserUI frame = new UserUI(formulaNum,maxNum);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 					}
 				});
 				button2.addActionListener(new ActionListener() {
@@ -260,49 +260,6 @@ public class MyFrame2 {
 		return frame;
 	}
 
-	private JDialog creatTips(JFrame frame) {
-		JDialog tips = new JDialog(frame, "提示", true);
-		tips.setSize(220,120);
-		tips.setLocationRelativeTo(null);
-		tips.setResizable(false);
-		tips.setLayout(new GridLayout(2,1));
-		Container c = tips.getContentPane();
-		JLabel label = new JLabel("是否导入题目？",JLabel.CENTER);
-		
-		c.add(label);
-		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.LEFT,32,0));
-		c.add(panel);
-		JButton button1 = new JButton("确认");
-		button1.setSize(60, 25);
-		panel.add(button1);
-		JButton button2 = new JButton("取消");
-		button2.setSize(60, 25);
-		panel.add(button2);
-		button1.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				errorNum = 0;
-				errorTitle = new int[formulaNum];
-				frame.dispose();
-				try {
-					new MyFrame2(formulaNum, maxNum);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		button2.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tips.dispose();
-			}
-		});
-		tips.setVisible(true);
-		return tips;
-	}
-	
 	private JDialog creatCount(JFrame frame) {
 		JDialog count = new JDialog(frame,"错误统计",true);
 		count.setSize(100, 100);
@@ -343,7 +300,7 @@ public class MyFrame2 {
 		});
 		return warning;
 	}
-	
+
 	private void creatCountFile() {
 		List<StringBuilder> result = new ArrayList<StringBuilder>();
 		StringBuilder correct = new StringBuilder();
@@ -362,6 +319,6 @@ public class MyFrame2 {
 		error.setCharAt(error.length()-1, '）');
 		result.add(correct);
 		result.add(error);
-		FileDao.storageFile1(result, "Count.txt");
+		FileDao.storageResult(result, "Grade.txt");
 	}
 }
